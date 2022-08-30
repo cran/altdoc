@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://unpkg.com/docute@4/dist/docute.css">
+    <!-- Reduce space between sections and subsections -->
+     <style>
+      .page-content h2 {
+        margin-top: 2em;
+      }
+      .page-content.has-page-title>h2:first-child {
+        margin-top: 2em;
+      }
+      .page-content h3 {
+        margin-top: 2em;
+      }
+      .page-content.has-page-title>h3:first-child {
+        margin-top: 2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="docute"></div>
+    <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
+    <script>
+      new Docute({
+        target: '#docute',
+        title: '{{title}}',
+        highlight: ['r'],
+        darkThemeToggler: true,
+        nav: [
+					{
+						title: 'Home',
+						link: '/'
+					},
+					{
+						title: 'GitHub',
+						link: '{{github_link}}'
+					}
+				],
+				sidebar: [
+					{title: 'Home', link: '/'},
+					{title: 'Changelog', link: '/NEWS'},
+					{
+					  title: 'Reference',
+					  link: '/reference'
+					},
+					{title: 'Code of Conduct', link: '/CODE_OF_CONDUCT'},
+					{title: 'License', link: '/LICENSE'}
+				],
+        footer: "{{footer}}"
+      })
+    </script>
+  </body>
+</html>
