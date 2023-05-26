@@ -13,12 +13,18 @@
 
 preview <- function(path = ".") {
 
+  doctype <- .doc_type(path)
+
   if (rstudioapi::isAvailable()) {
-    if (fs::file_exists(fs::path_abs("docs/index.html", start = path))) {
+    if (doctype %in% c("docute", "docsify")) {
       servr::httw(fs::path_abs("docs/"))
-    } else if (fs::file_exists(fs::path_abs("docs/site/index.html", start = path))) {
+    } else if (doctype == "mkdocs") {
       # first build
-      system2("cd", paste(fs::path_abs("docs", start = path), " && mkdocs build -q"))
+      if (.is_windows()) {
+        shell(paste("cd", fs::path_abs("docs", start = path), " && mkdocs build -q"))
+      } else {
+        system2("cd", paste(fs::path_abs("docs", start = path), " && mkdocs build -q"))
+      }
       # stop it directly to avoid opening the browser
       servr::daemon_stop()
 

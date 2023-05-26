@@ -2,7 +2,7 @@ Type: Package
 Package: altdoc
 Title: Use 'Docsify.js', 'Docute', or 'Mkdocs' to Generate a Package
         Documentation
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person(given = "Etienne",
            family = "Bacher",
@@ -15,16 +15,16 @@ Description: Most developers use 'pkgdown' to create a website for their package
 License: MIT + file LICENSE
 URL: https://github.com/etiennebacher/altdoc
 BugReports: https://github.com/etiennebacher/altdoc/issues
-Imports: cli, commonmark, desc, fs, here, htmltools, jsonlite,
-        rmarkdown, rstudioapi, servr, tools, usethis, utils, xml2,
-        xslt, yaml
+Imports: cli, desc, fs, here, htmltools, rmarkdown, rstudioapi, servr,
+        tinkr, tools, usethis, utils, xml2, yaml
 Suggests: covr, spelling, testthat (>= 3.0.0), withr
 Config/testthat/edition: 3
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3.9000
+Language: en-US
 NeedsCompilation: no
-Packaged: 2022-08-29 11:56:32 UTC; etienne
+Packaged: 2023-05-26 07:13:17 UTC; etienne
 Author: Etienne Bacher [aut, cre, cph]
 Maintainer: Etienne Bacher <etienne.bacher@protonmail.com>
 Repository: CRAN
-Date/Publication: 2022-08-30 12:50:05 UTC
+Date/Publication: 2023-05-26 18:50:08 UTC

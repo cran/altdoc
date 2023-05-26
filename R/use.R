@@ -1,11 +1,11 @@
 #' Init Docute, Docsify, or Mkdocs
 #'
-#' @param convert_vignettes Automatically convert and import vignettes if you
-#' have some. This will not modify files in the folder 'vignettes'.
 #' @param overwrite Overwrite the folder 'docs' if it already exists. If `FALSE`
 #' (default), there will be an interactive choice to make in the console to
 #' overwrite. If `TRUE`, the folder 'docs' is automatically overwritten.
 #' @param path Path. Default is the package root (detected with `here::here()`).
+#' @param custom_reference Path to the file that will be sourced to generate the
+#' "Reference" section.
 #'
 #' @export
 #'
@@ -25,68 +25,43 @@
 #' use_mkdocs()
 #' }
 
-use_docute <- function(convert_vignettes = TRUE, overwrite = FALSE,
-                       path = ".") {
+use_docute <- function(path = ".", overwrite = FALSE,
+                       custom_reference = NULL) {
 
-  path <- convert_path(path)
+  path <- .convert_path(path)
+  .check_is_package(path)
+  .check_docs_exists(overwrite, path)
 
-  if (!dir_is_package(path)) {
-    cli::cli_alert_danger("{.code altdoc} only works in packages.")
-    return(invisible())
-  }
+  .create_index("docute", path)
+  .build_docs(path, custom_reference)
+  .build_vignettes(path)
 
-  x <- check_docs_exists(overwrite = overwrite, path = path)
-  if (!is.null(x)) return(invisible())
-
-  create_index("docute", path = path)
-
-  build_docs(path = path)
-
-  ### VIGNETTES
-  if (isTRUE(convert_vignettes)) {
-    cli::cli_h1("Vignettes")
-    transform_vignettes(path = path)
-    add_vignettes(path = path)
-  }
-
-  final_steps(x = "docute", path = path)
-
+  .final_steps(x = "docute", path)
 }
 
 #' @export
 #'
 #' @rdname init
 
-use_docsify <- function(convert_vignettes = TRUE, overwrite = FALSE,
-                        path = ".") {
+use_docsify <- function(path = ".", overwrite = FALSE,
+                        custom_reference = NULL) {
 
-  path <- convert_path(path)
+  path <- .convert_path(path)
+  .check_is_package(path)
+  .check_docs_exists(overwrite, path)
 
-  if (!dir_is_package(path)) {
-    cli::cli_alert_danger("{.code altdoc} only works in packages.")
-    return(invisible())
-  }
+  .create_index("docsify", path = path)
 
-  x <- check_docs_exists(overwrite = overwrite, path = path)
-  if (!is.null(x)) return(invisible())
-
-  create_index("docsify", path = path)
-
-  build_docs(path = path)
+  .build_docs(path = path, custom_reference)
 
   fs::file_copy(
     system.file("docsify/_sidebar.md", package = "altdoc"),
     fs::path_abs("docs/_sidebar.md", start = path)
   )
 
-  ### VIGNETTES
-  if (isTRUE(convert_vignettes)) {
-    cli::cli_h1("Vignettes")
-    transform_vignettes(path = path)
-    add_vignettes(path = path)
-  }
+  .build_vignettes(path)
 
-  final_steps(x = "docsify", path = path)
+  .final_steps(x = "docsify", path = path)
 
 }
 
@@ -96,51 +71,34 @@ use_docsify <- function(convert_vignettes = TRUE, overwrite = FALSE,
 #' @param theme Name of the theme to use. Default is basic theme. See Details
 #' section.
 #'
-#' @param convert_vignettes Do you want to convert and import vignettes if you have
-#' some? This will not modify files in the folder 'vignettes'. This feature
-#' is experimental.
-#'
 #' @details
 #' If you are new to Mkdocs, the themes "readthedocs" and "material" are among
-#' the most popular and developed. You can also see a list of themes here: <https://github.com/mkdocs/mkdocs/wiki/MkDocs-Themes>.
+#' the most popular and developed. You can also see a list of themes here:
+#' <https://github.com/mkdocs/mkdocs/wiki/MkDocs-Themes>.
 #' @rdname init
 
-use_mkdocs <- function(theme = NULL, convert_vignettes = TRUE,
-                       overwrite = FALSE, path = ".") {
+use_mkdocs <- function(theme = NULL,
+                       path = ".",
+                       overwrite = FALSE,
+                       custom_reference = NULL) {
 
-  path <- convert_path(path)
+  path <- .convert_path(path)
+  .check_is_package(path)
+  .check_docs_exists(overwrite, path)
+  .check_tools("mkdocs", theme)
 
-  if (!dir_is_package(path)) {
-    cli::cli_alert_danger("{.code altdoc} only works in packages.")
-    return(invisible())
+  if (.is_windows() & interactive()) {
+    shell(paste("mkdocs new", fs::path_abs("docs", start = path), "-q"))
+    shell(paste("cd", fs::path_abs("docs", start = path), "&& mkdocs build -q"))
+  } else {
+    system2("mkdocs", paste("new", fs::path_abs("docs", start = path), "-q"))
+    system2("cd", paste(fs::path_abs("docs", start = path), "&& mkdocs build -q"))
   }
-
-  x <- check_docs_exists(overwrite = overwrite, path = path)
-  if (!is.null(x)) return(invisible())
-
-  # Create basic structure
-  if (!is_mkdocs()) {
-    cli::cli_alert_danger("Apparently, {.code mkdocs} is not installed on your system.")
-    cli::cli_alert_info("You can install it with {.code pip3 install mkdocs} in your terminal.")
-    cli::cli_alert_info("More information: {.url https://www.mkdocs.org/user-guide/installation/}")
-    return(invisible())
-  }
-
-  if (!is.null(theme) && theme == "material") {
-    if (!is_mkdocs_material()) {
-      cli::cli_alert_danger("Apparently, {.code mkdocs-material} is not installed on your system.")
-      cli::cli_alert_info("You can install it with {.code pip3 install mkdocs-material} in your terminal.")
-      return(invisible())
-    }
-  }
-
-  system2("mkdocs", paste("new", fs::path_abs("docs", start = path), "-q"))
-  system2("cd", paste(fs::path_abs("docs", start = path), "&& mkdocs build -q"))
 
   yaml <- paste0(
     "
 ### Basic information
-site_name: ", pkg_name(),
+site_name: ", .pkg_name(path),
 if (!is.null(theme)) {
   paste0("
 theme:
@@ -171,8 +129,8 @@ if (!is.null(theme) && theme == "material") {
 "
 
 ### Repo information
-repo_url: ", gh_url(), "
-repo_name: ", pkg_name(), "
+repo_url: ", .gh_url(path), "
+repo_name: ", .pkg_name(path), "
 
 ### Plugins
 plugins:
@@ -189,31 +147,25 @@ nav:
   )
   cat(yaml, file = fs::path_abs("docs/mkdocs.yml", start = path))
 
-  yaml <- readLines(fs::path_abs("docs/mkdocs.yml", start = path), warn = FALSE)
-  if (!fs::file_exists(fs::path_abs("docs/NEWS.md", start = path))) {
+  fs::file_delete(fs::path_abs("docs/docs/index.md", start = path))
+  .build_docs(path = path)
+
+  yaml <- .readlines(fs::path_abs("docs/mkdocs.yml", start = path))
+  if (!fs::file_exists(fs::path_abs("docs/docs/NEWS.md", start = path))) {
     yaml <- yaml[-which(grepl("NEWS.md", yaml))]
   }
-  if (!fs::file_exists(fs::path_abs("docs/LICENSE.md", start = path))) {
+  if (!fs::file_exists(fs::path_abs("docs/docs/LICENSE.md", start = path))) {
     yaml <- yaml[-which(grepl("LICENSE.md", yaml))]
   }
-  if (!fs::file_exists(fs::path_abs("docs/CODE_OF_CONDUCT.md", start = path))) {
+  if (!fs::file_exists(fs::path_abs("docs/docs/CODE_OF_CONDUCT.md", start = path))) {
     yaml <- yaml[-which(grepl("CODE_OF_CONDUCT.md", yaml))]
   }
-  if (!fs::file_exists(fs::path_abs("docs/reference.md", start = path))) {
+  if (!fs::file_exists(fs::path_abs("docs/docs/reference.md", start = path))) {
     yaml <- yaml[-which(grepl("reference.md", yaml))]
   }
   cat(yaml, file = fs::path_abs("docs/mkdocs.yml", start = path), sep = "\n")
 
+  .build_vignettes(path)
 
-  fs::file_delete(fs::path_abs("docs/docs/index.md", start = path))
-  build_docs(path = path)
-
-  ### VIGNETTES
-  if (isTRUE(convert_vignettes)) {
-    cli::cli_h1("Vignettes")
-    transform_vignettes(path = path)
-    add_vignettes(path = path)
-  }
-
-  final_steps(x = "mkdocs", path = path)
+  .final_steps(x = "mkdocs", path = path)
 }

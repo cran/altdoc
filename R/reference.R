@@ -1,19 +1,25 @@
-# @title Create 'Reference' tab
-#
-# @description
 # Convert and unite .Rd files to 'docs/reference.md'.
+.make_reference <- function(update = FALSE, path = ".",
+                            custom_reference = NULL) {
 
-make_reference <- function(update = FALSE, path = ".") {
+  cli::cli_h1("Building reference")
+  if (!is.null(custom_reference)) {
+    cli::cli_progress_bar("{cli::pb_spin} Running file {.file {custom_reference}}")
+    source(custom_reference, echo = FALSE)
+    cli::cli_alert_success("Custom file for {.pkg Reference} finished running.")
+    return(invisible)
+  }
 
-  good_path <- doc_path(path = path)
-
-  if (fs::file_exists(paste0(good_path, "/reference.md"))) fs::file_delete(paste0(good_path, "/reference.md"))
+  good_path <- .doc_path(path = path)
+  if (fs::file_exists(paste0(good_path, "/reference.md"))) {
+    fs::file_delete(paste0(good_path, "/reference.md"))
+  }
 
   files <- list.files("man", full.names = TRUE)
   files <- files[grepl("\\.Rd", files)]
 
   all_rd_as_md <- lapply(files, function(x){
-    rd2md(x)
+    .rd2md(x)
   })
 
   fs::file_create(paste0(good_path, "/reference.md"))
@@ -23,12 +29,8 @@ make_reference <- function(update = FALSE, path = ".") {
 }
 
 
-# Convert Rd files to Markdown
-#
-# @param rdfile Filename
-#
-
-rd2md <- function(rdfile) {
+# Convert Rd file to Markdown
+.rd2md <- function(rdfile) {
 
   tmp_html <- tempfile(fileext = ".html")
   tmp_md <- tempfile(fileext = ".md")
@@ -39,7 +41,7 @@ rd2md <- function(rdfile) {
   cat("\n\n---", file = tmp_md, append = TRUE)
 
   # Get function title and remove HTML tags left
-  md <- readLines(tmp_md, warn = FALSE)
+  md <- .readlines(tmp_md)
   md <- md[-c(1:10)]
 
   # Title to put in sidebar
@@ -53,7 +55,6 @@ rd2md <- function(rdfile) {
     paste0("## ", title),
     md
   )
-
 
   # Syntax used for examples is four spaces, which prevents code
   # highlighting. So I need to put backticks before and after the examples
@@ -71,9 +72,7 @@ rd2md <- function(rdfile) {
       md[i] <- gsub("    ", "", md[i])
     }
   }
-
   md
-
 }
 
 

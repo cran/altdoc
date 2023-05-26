@@ -6,27 +6,26 @@
 \alias{use_mkdocs}
 \title{Init Docute, Docsify, or Mkdocs}
 \usage{
-use_docute(convert_vignettes = TRUE, overwrite = FALSE, path = ".")
+use_docute(path = ".", overwrite = FALSE, custom_reference = NULL)
 
-use_docsify(convert_vignettes = TRUE, overwrite = FALSE, path = ".")
+use_docsify(path = ".", overwrite = FALSE, custom_reference = NULL)
 
 use_mkdocs(
   theme = NULL,
-  convert_vignettes = TRUE,
+  path = ".",
   overwrite = FALSE,
-  path = "."
+  custom_reference = NULL
 )
 }
 \arguments{
-\item{convert_vignettes}{Do you want to convert and import vignettes if you have
-some? This will not modify files in the folder 'vignettes'. This feature
-is experimental.}
+\item{path}{Path. Default is the package root (detected with \code{here::here()}).}
 
 \item{overwrite}{Overwrite the folder 'docs' if it already exists. If \code{FALSE}
 (default), there will be an interactive choice to make in the console to
 overwrite. If \code{TRUE}, the folder 'docs' is automatically overwritten.}
 
-\item{path}{Path. Default is the package root (detected with \code{here::here()}).}
+\item{custom_reference}{Path to the file that will be sourced to generate the
+"Reference" section.}
 
 \item{theme}{Name of the theme to use. Default is basic theme. See Details
 section.}
@@ -40,7 +39,8 @@ Init Docute, Docsify, or Mkdocs
 }
 \details{
 If you are new to Mkdocs, the themes "readthedocs" and "material" are among
-the most popular and developed. You can also see a list of themes here: \url{https://github.com/mkdocs/mkdocs/wiki/MkDocs-Themes}.
+the most popular and developed. You can also see a list of themes here:
+\url{https://github.com/mkdocs/mkdocs/wiki/MkDocs-Themes}.
 }
 \examples{
 if (interactive()) {
