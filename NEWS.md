@@ -1,3 +1,8 @@
+# altdoc 0.2.2
+
+* If necessary, two spaces are automatically added in nested lists in the `NEWS` 
+  (or `Changelog`) file. 
+
 # altdoc 0.2.1
 
 * Fix test failures on CRAN due to the new version of `usethis` 
