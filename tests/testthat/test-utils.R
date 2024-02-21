@@ -7,17 +7,6 @@ test_that(".folder_is_empty() works", {
   expect_false(.folder_is_empty("docs"))
 })
 
-test_that(".check_docs_exists() works", {
-  create_local_package()
-  expect_silent(.check_docs_exists())
-
-  fs::dir_create("docs")
-  expect_silent(.check_docs_exists())
-
-  fs::file_create("docs/test.md")
-  expect_error(.check_docs_exists())
-})
-
 test_that(".pkg_name() works", {
   create_local_package()
   expect_true(is.character(.pkg_name(getwd())))
@@ -30,59 +19,40 @@ test_that(".pkg_version() works", {
   expect_true(nchar(.pkg_version(".")) > 0)
 })
 
-test_that("import_* functions work", {
+test_that(".parse_news works", {
+  skip_if_not_installed("desc")
   create_local_package()
-  fs::dir_create("docs")
-  cat("docute", file = "docs/index.html")
+  desc::desc_set_urls("https://github.com/etiennebacher/altdoc")
+  input <- "# 1.1.0\n\n* thanks @foo-bar for their contribution (#111)\n\n* thanks @foo2- for their contribution (#11)\n\n* due to issue in another repo (pola-rs/polars#112)\n\n* thanks @JohnDoe, @JaneDoe"
+  cat(input, file = "NEWS.md")
+  .parse_news(".", "NEWS.md")
+  parsed <- paste(.readlines("NEWS.md"), collapse = "")
 
-  usethis::use_readme_md()
-  expect_false(fs::file_exists("docs/README.md"))
-  .import_readme()
-  expect_true(fs::file_exists("docs/README.md"))
-
-  usethis::use_code_of_conduct("etienne.bacher@protonmail.com")
-  expect_false(fs::file_exists("docs/CODE_OF_CONDUCT.md"))
-  .import_coc()
-  expect_true(fs::file_exists("docs/CODE_OF_CONDUCT.md"))
-
-  withr::with_options(
-    list(repos = c("CRAN" = "https://cloud.r-project.org")),
-    {
-      usethis::use_news_md()
-    }
+  should_be_found <- c(
+    "[@foo-bar](https://github.com/foo-bar)",
+    "[#111](https://github.com/etiennebacher/altdoc/issues/111)",
+    "[@foo2-](https://github.com/foo2-)",
+    "[#11](https://github.com/etiennebacher/altdoc/issues/11)",
+    "[@JohnDoe](https://github.com/JohnDoe), [@JaneDoe](https://github.com/JaneDoe)"
   )
-  expect_false(fs::file_exists("docs/NEWS.md"))
-  .import_news()
-  expect_true(fs::file_exists("docs/NEWS.md"))
 
+  expect_true(
+    all(sapply(should_be_found, grepl, x = parsed, fixed = TRUE))
+  )
 })
 
-test_that(".need_to_bump_version() works", {
+test_that(".which_license works", {
   create_local_package()
-  use_docute(path = getwd())
-
-  expect_equal(.doc_version(getwd()), "0.0.0.9000")
-  expect_false(.need_to_bump_version(getwd()))
-
-  desc::desc_set_version("0.1.0")
-
-  expect_true(.need_to_bump_version(getwd()))
-  .update_version_number(getwd())
-  expect_equal(.doc_version(getwd()), "0.1.0")
-  expect_equal(.altdoc_version_in_footer(getwd()), .altdoc_version())
+  fs::file_create("LICENSE.md")
+  expect_equal(.which_license(), "LICENSE.md")
+  fs::file_delete("LICENSE.md")
+  fs::file_create("LICENCE.md")
+  expect_equal(.which_license(), "LICENCE.md")
+  fs::file_delete("LICENCE.md")
+  expect_null(.which_license())
 })
 
-test_that(".need_to_bump_version() works", {
+test_that(".find_head_branch works if no git", {
   create_local_package()
-  use_docsify(path = getwd())
-
-  expect_equal(.doc_version(getwd()), "0.0.0.9000")
-  expect_false(.need_to_bump_version(getwd()))
-
-  desc::desc_set_version("0.1.0")
-
-  expect_true(.need_to_bump_version(getwd()))
-  .update_version_number(getwd())
-  expect_equal(.doc_version(getwd()), "0.1.0")
-  expect_equal(.altdoc_version_in_footer(getwd()), .altdoc_version())
+  expect_null(.find_head_branch())
 })
