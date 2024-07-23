@@ -24,6 +24,8 @@ test_that("docute: main files are correct", {
   expect_snapshot(.readlines("docs/NEWS.md"), variant = "docute")
   expect_snapshot(.readlines("docs/man/hello_base.md"), variant = "docute")
   expect_snapshot(.readlines("docs/man/hello_r6.md"), variant = "docute")
+  expect_snapshot(.readlines("docs/man/examplesIf_true.md"), variant = "docute")
+  expect_snapshot(.readlines("docs/man/examplesIf_false.md"), variant = "docute")
   expect_snapshot(.readlines("docs/vignettes/test.md"), variant = "docute")
 })
 
@@ -56,6 +58,8 @@ test_that("docsify: main files are correct", {
   expect_snapshot(.readlines("docs/NEWS.md"), variant = "docsify")
   expect_snapshot(.readlines("docs/man/hello_base.md"), variant = "docsify")
   expect_snapshot(.readlines("docs/man/hello_r6.md"), variant = "docsify")
+  expect_snapshot(.readlines("docs/man/examplesIf_true.md"), variant = "docsify")
+  expect_snapshot(.readlines("docs/man/examplesIf_false.md"), variant = "docsify")
   expect_snapshot(.readlines("docs/vignettes/test.md"), variant = "docsify")
 })
 
@@ -132,6 +136,32 @@ test_that("quarto: no error for basic workflow", {
   # expect_snapshot(.readlines("docs/man/hello_base.html"))
   # expect_snapshot(.readlines("docs/man/hello_r6.html"))
   # expect_snapshot(.readlines("docs/vignettes/test.html"))
+})
+
+
+test_that("quarto: autolink", {
+  skip_on_cran()
+  skip_if(.is_windows() && .on_ci(), "Windows on CI")
+
+  ### setup: create a temp package using the structure of testpkg.altdoc
+  path_to_example_pkg <- fs::path_abs(test_path("examples/testpkg.altdoc"))
+  create_local_project()
+  fs::dir_delete("R")
+  fs::dir_copy(path_to_example_pkg, ".")
+  all_files <- list.files("testpkg.altdoc", full.names = TRUE)
+  for (i in all_files) {
+    fs::file_move(i, ".")
+  }
+  fs::dir_delete("testpkg.altdoc")
+
+  ### generate docs
+  install.packages(".", repos = NULL, type = "source")
+  fs::file_move("README.Rmd", "README.qmd") # special thing quarto
+  setup_docs("quarto_website")
+  expect_no_error(render_docs(verbose = .on_ci()))
+
+  tmp <- .readlines("docs/vignettes/test.html")
+  expect_true(any(grepl("https://rdrr.io/r/base/library.html", tmp, fixed = TRUE)))
 })
 
 

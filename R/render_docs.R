@@ -7,6 +7,7 @@
 #' @param verbose Logical. Print Rmarkdown or Quarto rendering output.
 #' @param parallel Logical. Render man pages and vignettes in parallel using the `future` framework. In addition to setting this argument to TRUE, users must define the parallelism plan in `future`. See the examples section below.
 #' @param freeze Logical. If TRUE and a man page or vignette has not changed since the last call to `render_docs()`, that file is skipped. File hashes are stored in `altdoc/freeze.rds`. If that file is deleted, all man pages and vignettes will be rendered anew.
+#' @param ... Additional arguments are ignored.
 #' @inheritParams setup_docs
 #' @export
 #'
@@ -31,6 +32,8 @@
 #' @return NULL
 #' @template altdoc_variables
 #' @template altdoc_preambles
+#' @template altdoc_freeze
+#' @template altdoc_autolink
 #'
 #' @examples
 #' if (interactive()) {
@@ -43,7 +46,14 @@
 #'   render_docs(parallel = TRUE)
 #'
 #' }
-render_docs <- function(path = ".", verbose = FALSE, parallel = FALSE, freeze = FALSE) {
+render_docs <- function(path = ".", verbose = FALSE, parallel = FALSE, freeze = FALSE, ...) {
+
+  # Quarto sometimes raises errors encouraging users to set `quiet=FALSE` to get more information. 
+  # This is a convenience check to match Quarto's `quiet` and `altdoc`'s `verbose` arguments.
+  dots <- list(...)
+  if ("quiet" %in% names(dots) && is.logical(dots[["quiet"]]) && isTRUE(length(dots[["quiet"]]) == 1)) {
+    verbose <- !dots[["quiet"]]
+  }
 
   path <- .convert_path(path)
   tool <- .doc_type(path)
@@ -56,24 +66,25 @@ render_docs <- function(path = ".", verbose = FALSE, parallel = FALSE, freeze = 
   # build quarto in a separate folder to use the built-in freeze functionality
   # and to allow moving the _site folder to docs/
   if (tool == "quarto_website") {
-    docs_parent <- fs::path_join(c(path, "_quarto"))
-    # avoid collisions
-    if (fs::dir_exists(docs_parent)) {
-      fs::dir_delete(docs_parent)
+    docs_dir <- fs::path_join(c(path, "_quarto"))
+
+    # Delete everything in `_quarto/` besides `_freeze/`
+    if (fs::dir_exists(docs_dir)) {
+      docs_files <- fs::dir_ls(docs_dir)
+      if (freeze == TRUE) {
+        docs_files <- Filter(function(f) basename(f) != "_freeze", docs_files)
+      } 
+      fs::file_delete(docs_files)
     }
-    .add_gitignore("^_quarto$", path = path)
+
   } else {
-    docs_parent <- path
+    docs_dir <- fs::path_join(c(path, "docs"))
   }
 
-  # create docs/
-  docs_dir <- fs::path_join(c(docs_parent, "docs"))
-  if (!fs::dir_exists(docs_dir)) {
-    fs::dir_create(docs_dir)
-  }
+  # create `docs_dir/`
+  fs::dir_create(docs_dir)
 
-  cli::cli_h1("Basic files")
-
+  cli::cli_h1("Basic files")  
   basics <- c("NEWS", "CHANGELOG", "ChangeLog", "CODE_OF_CONDUCT", "LICENSE", "LICENCE")
   for (b in basics) {
     .import_basic(src_dir = path, tar_dir = docs_dir, name = b)
@@ -89,6 +100,7 @@ render_docs <- function(path = ".", verbose = FALSE, parallel = FALSE, freeze = 
   # Update vignettes
   cli::cli_h1("Vignettes")
   fail_vignettes <- .import_vignettes(src_dir = path, tar_dir = docs_dir, tool = tool, verbose = verbose, parallel = parallel, freeze = freeze)
+
 
   # Error so that CI fails
   if (length(fail_vignettes) > 0 & length(fail_man) > 0) {

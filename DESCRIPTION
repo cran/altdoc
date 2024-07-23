@@ -2,7 +2,7 @@ Type: Package
 Package: altdoc
 Title: Package Documentation Websites with 'Quarto', 'Docsify',
         'Docute', or 'MkDocs'
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     c(person(given = "Etienne",
              family = "Bacher",
@@ -10,7 +10,7 @@ Authors@R:
              email = "etienne.bacher@protonmail.com"),
       person(given = "Vincent",
              family = "Arel-Bundock",
-             role = "ctb",
+             role = "aut",
              email = "vincent.arel-bundock@umontreal.ca",
              comment = c(ORCID = "0000-0003-2042-7063"))
     )
@@ -22,18 +22,18 @@ License: MIT + file LICENSE
 URL: https://altdoc.etiennebacher.com,
         https://github.com/etiennebacher/altdoc
 BugReports: https://github.com/etiennebacher/altdoc/issues
-Imports: cli, desc, fs, quarto, tools, utils
-Suggests: covr, digest, future, future.apply, knitr, servr, spelling,
-        testthat (>= 3.0.0), usethis, withr, yaml
+Imports: cli, desc, evaluate, fs, quarto, tools, utils
+Suggests: covr, digest, downlit, future, future.apply, knitr, servr,
+        spelling, testthat (>= 3.0.0), usethis, withr, yaml
 Config/testthat/edition: 3
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Language: en-US
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-02-21 15:36:56 UTC; etienne
+Packaged: 2024-07-23 20:23:29 UTC; etienne
 Author: Etienne Bacher [aut, cre, cph],
-  Vincent Arel-Bundock [ctb] (<https://orcid.org/0000-0003-2042-7063>)
+  Vincent Arel-Bundock [aut] (<https://orcid.org/0000-0003-2042-7063>)
 Maintainer: Etienne Bacher <etienne.bacher@protonmail.com>
 Repository: CRAN
-Date/Publication: 2024-02-21 16:00:06 UTC
+Date/Publication: 2024-07-23 21:10:02 UTC

@@ -135,24 +135,25 @@ Settings</a>
 </tr>
 <tr>
 <td>
-MkDocs
+Quarto
 </td>
 <td>
-<code>polars</code>
+<code>tinytable</code>
 </td>
 <td>
-🌐<a href="https://rpolars.github.io">rpolars.github.io</a>
+🌐<a href="https://vincentarelbundock.github.io/tinytable/">vincentarelbundock.github.io/tinytable/</a>
 </td>
 <td>
-<a href="https://github.com/pola-rs/r-polars">Github Repository</a>
+<a href="https://github.com/vincentarelbundock/tinytable/tree/main/altdoc">Altdoc
+Settings</a>
 </td>
 </tr>
 <tr>
 <td>
-Docsify
+Quarto
 </td>
 <td>
-<code>plot2</code>
+<code>tinyplot</code>
 </td>
 <td>
 🌐<a href="https://grantmcdermott.com/tinyplot/">grantmcdermott.com/tinyplot</a>
@@ -160,6 +161,20 @@ Docsify
 <td>
 <a href="https://github.com/grantmcdermott/tinyplot/tree/main/altdoc">Altdoc
 Settings</a>
+</td>
+</tr>
+<tr>
+<td>
+MkDocs
+</td>
+<td>
+<code>polars</code>
+</td>
+<td>
+🌐<a href="https://pola-rs.github.io/r-polars/">pola-rs.github.io/r-polars</a>
+</td>
+<td>
+<a href="https://github.com/pola-rs/r-polars">Github Repository</a>
 </td>
 </tr>
 <tr>
