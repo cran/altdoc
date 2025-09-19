@@ -2,7 +2,7 @@ Type: Package
 Package: altdoc
 Title: Package Documentation Websites with 'Quarto', 'Docsify',
         'Docute', or 'MkDocs'
-Version: 0.5.0
+Version: 0.6.0
 Authors@R: 
     c(person(given = "Etienne",
              family = "Bacher",
@@ -31,9 +31,10 @@ RoxygenNote: 7.3.2
 Language: en-US
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2025-01-23 16:23:04 UTC; etienne
+Packaged: 2025-09-19 11:43:15 UTC; etienne
 Author: Etienne Bacher [aut, cre, cph],
-  Vincent Arel-Bundock [aut] (<https://orcid.org/0000-0003-2042-7063>)
+  Vincent Arel-Bundock [aut] (ORCID:
+    <https://orcid.org/0000-0003-2042-7063>)
 Maintainer: Etienne Bacher <etienne.bacher@protonmail.com>
 Repository: CRAN
-Date/Publication: 2025-01-23 16:40:07 UTC
+Date/Publication: 2025-09-19 12:00:02 UTC
