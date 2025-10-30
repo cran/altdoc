@@ -60,31 +60,36 @@
     }
     yaml::write_yaml(yml, fn, indent.mapping.sequence = TRUE)
 
-    fn <- fs::path_join(c(path, "index.html"))
+    fn <- fs::path_join(c(path, "docs", "index.html"))
     if (fs::file_exists(fn)) {
         fs::file_delete(fn)
+    }
+
+    venv_path <- Sys.getenv("ALTDOC_VENV")
+    if (identical(venv_path, "")) {
+        venv_path <- ".venv_altdoc"
     }
 
     # render mkdocs
     if (.is_windows()) {
         shell(
-            paste(
-                "cd",
+            paste0(
+                "cd ",
                 fs::path_abs(path),
-                "&& .venv_altdoc\\Scripts\\activate.bat",
-                "&& python3 -m mkdocs build -q"
+                " && ",
+                fs::path(venv_path, "Scripts", "python"),
+                " -m mkdocs build -q"
             )
         )
     } else {
-        goback <- getwd()
         system2(
             "bash",
             paste0(
-                "-c 'source ",
-                fs::path_join(
-                    c(fs::path_abs(path), "/.venv_altdoc/bin/activate")
-                ),
-                " && python3 -m mkdocs build -q'"
+                "-c 'cd ",
+                fs::path_abs(path),
+                "&& ",
+                venv_path,
+                "/bin/python3 -m mkdocs build -q'"
             )
         )
     }

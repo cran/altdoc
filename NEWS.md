@@ -1,5 +1,28 @@
 # News
 
+## 0.7.0
+
+### New features
+
+* When using `mkdocs` as documentation generator, the Python virtual environment
+  to be used can now be set with the environment variable `ALTDOC_VENV`. It
+  doesn't have to be `.venv_altdoc` located at the project root anymore (#339).
+
+* `render_docs()` now updates the file `altdoc/pkgdown.yml`. This file was also
+  adapted so that it can be used by R-universe to display a link to the package
+  website (#344).
+
+### Bug fixes
+
+* When using `mkdocs` as documentation generator, changes in settings such as
+  overrides templates or CSS files are now correctly applied to `docs/index.html`.
+  Previously, it was required to manually delete the file and run `render_docs()`
+  again (#337).
+
+### Misc
+
+* Fix errors in CRAN checks occurring when Quarto isn't available on the system.
+
 ## 0.6.0
 
 ### Changes

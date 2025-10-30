@@ -26,8 +26,6 @@
 #'   - CODE_OF_CONDUCT.md, CODE_OF_CONDUCT.txt, CODE_OF_CONDUCT
 #' * `docs/LICENSE.md`
 #'   - LICENSE.md, LICENSE.txt, LICENSE
-#' * `docs/LICENCE.md`
-#'   - LICENCE.md, LICENCE.txt, LICENCE
 #'
 #' @return NULL
 #' @template altdoc_variables
@@ -54,6 +52,7 @@ render_docs <- function(
     ...
 ) {
     .check_quarto_installed()
+    .add_pkgdown(path)
 
     # Quarto sometimes raises errors encouraging users to set `quiet=FALSE` to get more information.
     # This is a convenience check to match Quarto's `quiet` and `altdoc`'s `verbose` arguments.
